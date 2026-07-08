@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>开发者技术趋势画像平台</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f6f8;
+      --panel: #ffffff;
+      --text: #20242a;
+      --muted: #667085;
+      --line: #d9e0e8;
+      --accent: #0969da;
+      --accent-soft: #ddf4ff;
+      --good: #1a7f37;
+      --warn: #bf8700;
+      --danger: #cf222e;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, "Microsoft YaHei", sans-serif;
+    }
+    header {
+      background: #20242a;
+      color: white;
+      padding: 28px 36px;
+    }
+    header h1 { margin: 0 0 8px; font-size: 28px; }
+    header p { margin: 0; color: #d0d7de; }
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 24px 18px 48px;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .stat, .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+    }
+    .stat span { display: block; color: var(--muted); font-size: 13px; }
+    .stat strong { display: block; margin-top: 8px; font-size: 26px; }
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(320px, .95fr);
+      gap: 18px;
+      align-items: start;
+    }
+    h2 { margin: 0 0 14px; font-size: 20px; }
+    h3 { margin: 18px 0 10px; font-size: 16px; }
+    .skill-picker {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      max-height: 260px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+    .skill-chip input { position: absolute; opacity: 0; }
+    .skill-chip span {
+      display: inline-flex;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: #f8fafc;
+      cursor: pointer;
+      user-select: none;
+      font-size: 14px;
+    }
+    .skill-chip input:checked + span {
+      background: var(--accent-soft);
+      border-color: #54aeef;
+      color: var(--accent);
+      font-weight: 700;
+    }
+    .actions { display: flex; gap: 10px; margin-top: 16px; }
+    button {
+      border: 0;
+      border-radius: 7px;
+      padding: 10px 14px;
+      background: var(--accent);
+      color: white;
+      cursor: pointer;
+      font-weight: 700;
+    }
+    button.secondary {
+      background: #eef2f6;
+      color: var(--text);
+    }
+    .score-wrap {
+      display: grid;
+      grid-template-columns: 140px minmax(0, 1fr);
+      gap: 18px;
+      align-items: center;
+    }
+    .score-circle {
+      width: 132px;
+      height: 132px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: conic-gradient(var(--accent) calc(var(--score) * 1%), #eaeef2 0);
+    }
+    .score-inner {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background: white;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      font-weight: 800;
+      font-size: 24px;
+    }
+    .result-list, .rank-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 8px;
+    }
+    .result-list li, .rank-list li {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid #edf1f5;
+      padding: 8px 0;
+    }
+    .result-list span, .rank-list span { color: var(--muted); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th, td {
+      border-bottom: 1px solid var(--line);
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { background: #f8fafc; }
+    a { color: var(--accent); text-decoration: none; }
+    .subgrid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 18px;
+    }
+    .badge {
+      display: inline-flex;
+      border: 1px solid #54aeef;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 13px;
+    }
+    @media (max-width: 860px) {
+      .stats, .grid, .subgrid, .score-wrap { grid-template-columns: 1fr; }
+      header { padding: 22px 18px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>开发者技术趋势画像与个人技能对标平台</h1>
+    <p>数据来源：真实 GitHub 数据。勾选你掌握的技术栈，系统会根据当前 GitHub 趋势计算匹配度和学习建议。</p>
+  </header>
+  <main>
+    <div class="stats">
+      <div class="stat"><span>仓库数量</span><strong>15</strong></div>
+      <div class="stat"><span>技能记录</span><strong>27</strong></div>
+      <div class="stat"><span>可选技术栈</span><strong>17</strong></div>
+    </div>
+    <div class="grid">
+      <section class="panel">
+        <h2>选择你掌握的技术栈</h2>
+        <div class="skill-picker" id="skillPicker"><label class="skill-chip"><input type="checkbox" value="AI"><span>AI</span></label>
+<label class="skill-chip"><input type="checkbox" value="Agent"><span>Agent</span></label>
+<label class="skill-chip"><input type="checkbox" value="C#"><span>C#</span></label>
+<label class="skill-chip"><input type="checkbox" value="C++"><span>C++</span></label>
+<label class="skill-chip"><input type="checkbox" value="CSS"><span>CSS</span></label>
+<label class="skill-chip"><input type="checkbox" value="Go"><span>Go</span></label>
+<label class="skill-chip"><input type="checkbox" value="JavaScript"><span>JavaScript</span></label>
+<label class="skill-chip"><input type="checkbox" value="Kubernetes"><span>Kubernetes</span></label>
+<label class="skill-chip"><input type="checkbox" value="MySQL"><span>MySQL</span></label>
+<label class="skill-chip"><input type="checkbox" value="Node.js"><span>Node.js</span></label>
+<label class="skill-chip"><input type="checkbox" value="PostgreSQL"><span>PostgreSQL</span></label>
+<label class="skill-chip"><input type="checkbox" value="Prisma"><span>Prisma</span></label>
+<label class="skill-chip"><input type="checkbox" value="Python"><span>Python</span></label>
+<label class="skill-chip"><input type="checkbox" value="Rust"><span>Rust</span></label>
+<label class="skill-chip"><input type="checkbox" value="SQLite"><span>SQLite</span></label>
+<label class="skill-chip"><input type="checkbox" value="Shell"><span>Shell</span></label>
+<label class="skill-chip"><input type="checkbox" value="TypeScript"><span>TypeScript</span></label></div>
+        <div class="actions">
+          <button id="analyzeBtn" type="button">分析匹配度</button>
+          <button class="secondary" id="clearBtn" type="button">清空选择</button>
+        </div>
+      </section>
+      <section class="panel">
+        <h2>匹配结果</h2>
+        <div id="matchResult"></div>
+      </section>
+    </div>
+    <div class="subgrid">
+      <section class="panel">
+        <h2>语言排行</h2>
+        <ul class="rank-list"><li><strong>TypeScript</strong><span>4</span></li><li><strong>Rust</strong><span>2</span></li><li><strong>JavaScript</strong><span>2</span></li><li><strong>Python</strong><span>2</span></li><li><strong>Shell</strong><span>1</span></li><li><strong>Go</strong><span>1</span></li><li><strong>CSS</strong><span>1</span></li><li><strong>C++</strong><span>1</span></li></ul>
+      </section>
+      <section class="panel">
+        <h2>技能关键词热度</h2>
+        <ul class="rank-list"><li><strong>AI</strong><span>6</span></li><li><strong>TypeScript</strong><span>4</span></li><li><strong>Agent</strong><span>3</span></li><li><strong>JavaScript</strong><span>2</span></li><li><strong>Python</strong><span>2</span></li><li><strong>Rust</strong><span>2</span></li><li><strong>Go</strong><span>1</span></li><li><strong>Kubernetes</strong><span>1</span></li><li><strong>MySQL</strong><span>1</span></li><li><strong>Node.js</strong><span>1</span></li></ul>
+      </section>
+    </div>
+    <section class="panel" style="margin-top:18px">
+      <h2>仓库数据表</h2>
+      <table>
+        <thead><tr><th>仓库</th><th>语言</th><th>Stars</th><th>描述</th></tr></thead>
+        <tbody><tr><td><a href="https://github.com/obra/superpowers">obra/superpowers</a></td><td>Shell</td><td>249,365</td><td>An agentic skills framework &amp; software development methodology that works.</td></tr>
+<tr><td><a href="https://github.com/ruvnet/RuView">ruvnet/RuView</a></td><td>Rust</td><td>78,835</td><td>π RuView turns commodity WiFi signals into real-time spatial intelligence, vital sign monitoring, and presence detection — all without a single pixel of video.</td></tr>
+<tr><td><a href="https://github.com/addyosmani/agent-skills">addyosmani/agent-skills</a></td><td>JavaScript</td><td>72,755</td><td>Production-grade engineering skills for AI coding agents.</td></tr>
+<tr><td><a href="https://github.com/asgeirtj/system_prompts_leaks">asgeirtj/system_prompts_leaks</a></td><td>JavaScript</td><td>53,573</td><td>Extracted system prompts from Anthropic - Claude Fable 5, Opus 4.8, Claude Code, Claude Design. OpenAI - ChatGPT 5.5 Thinking, GPT 5.5 Instant, Codex. Google - Gemini 3.5 Flash, 3.1 Pro, Antigravity. xAI - Grok, Cursor, Copilot, VS Code, Perplexity, and more. Updated regularly.</td></tr>
+<tr><td><a href="https://github.com/mvanhorn/last30days-skill">mvanhorn/last30days-skill</a></td><td>Python</td><td>50,480</td><td>AI agent skill that researches any topic across Reddit, X, YouTube, HN, Polymarket, and the web - then synthesizes a grounded summary</td></tr>
+<tr><td><a href="https://github.com/prisma/prisma">prisma/prisma</a></td><td>TypeScript</td><td>46,376</td><td>Next-generation ORM for Node.js &amp; TypeScript | PostgreSQL, MySQL, MariaDB, SQL Server, SQLite, MongoDB and CockroachDB</td></tr>
+<tr><td><a href="https://github.com/argoproj/argo-cd">argoproj/argo-cd</a></td><td>Go</td><td>23,357</td><td>Declarative Continuous Deployment for Kubernetes</td></tr>
+<tr><td><a href="https://github.com/Diolinux/PhotoGIMP">Diolinux/PhotoGIMP</a></td><td>CSS</td><td>14,588</td><td>A Patch for GIMP 3+ for Photoshop Users</td></tr>
+<tr><td><a href="https://github.com/alibaba/zvec">alibaba/zvec</a></td><td>C++</td><td>14,201</td><td>A lightweight, lightning-fast, in-process vector database</td></tr>
+<tr><td><a href="https://github.com/MadsLorentzen/ai-job-search">MadsLorentzen/ai-job-search</a></td><td>TypeScript</td><td>13,268</td><td>AI-powered job application framework built on Claude Code. Fork it, fill in your profile, and let Claude evaluate jobs, tailor CVs, write cover letters, and prepare you for interviews.</td></tr>
+<tr><td><a href="https://github.com/iOfficeAI/OfficeCLI">iOfficeAI/OfficeCLI</a></td><td>C#</td><td>10,926</td><td>OfficeCLI is the first and best Office suite purpose-built for AI agents to read, edit, and automate Word, Excel, and PowerPoint files. Free, open-source, single binary, no Office installation required.</td></tr>
+<tr><td><a href="https://github.com/TencentCloud/CubeSandbox">TencentCloud/CubeSandbox</a></td><td>Rust</td><td>8,711</td><td>Instant, Concurrent, Secure &amp; Lightweight Sandbox for AI Agents.</td></tr>
+<tr><td><a href="https://github.com/TencentCloud/TencentDB-Agent-Memory">TencentCloud/TencentDB-Agent-Memory</a></td><td>TypeScript</td><td>7,313</td><td>TencentDB Agent Memory delivers fully local long-term memory for AI Agents via a 4-tier progressive pipeline, with zero external API dependencies.</td></tr>
+<tr><td><a href="https://github.com/wonderwhy-er/DesktopCommanderMCP">wonderwhy-er/DesktopCommanderMCP</a></td><td>TypeScript</td><td>6,281</td><td>This is MCP server for Claude that gives it terminal control, file system search and diff file editing capabilities</td></tr>
+<tr><td><a href="https://github.com/bradautomates/claude-video">bradautomates/claude-video</a></td><td>Python</td><td>5,664</td><td>Give Claude the ability to watch any video. /watch downloads, extracts frames, transcribes, hands it all to Claude.</td></tr></tbody>
+      </table>
+    </section>
+  </main>
+  <script>
+    window.INITIAL_REPORT = {"match_percent": 9, "level": "需要补强", "selected_skills": ["Flask", "Python", "SQLite"], "matched_skills": [{"skill": "Python", "score": 84216, "category": "后端 / 数据分析"}, {"skill": "SQLite", "score": 46376, "category": "数据库"}], "missing_skills": [{"skill": "Shell", "score": 374047, "category": "自动化运维"}, {"skill": "JavaScript", "score": 189491, "category": "前端开发"}, {"skill": "AI", "score": 163453, "category": "人工智能"}, {"skill": "Rust", "score": 131318, "category": "系统编程"}, {"skill": "Agent", "score": 130548, "category": "人工智能"}, {"skill": "TypeScript", "score": 109856, "category": "前端工程化"}], "category_gaps": [{"category": "自动化运维", "score": 374047}, {"category": "人工智能", "score": 294001}, {"category": "前端开发", "score": 189491}, {"category": "系统编程", "score": 131318}, {"category": "前端工程化", "score": 109856}], "recommendations": ["优先学习 Shell，它属于「自动化运维」方向，在当前 GitHub 趋势数据中热度较高。", "优先学习 JavaScript，它属于「前端开发」方向，在当前 GitHub 趋势数据中热度较高。", "优先学习 AI，它属于「人工智能」方向，在当前 GitHub 趋势数据中热度较高。", "优先学习 Rust，它属于「系统编程」方向，在当前 GitHub 趋势数据中热度较高。", "优先学习 Agent，它属于「人工智能」方向，在当前 GitHub 趋势数据中热度较高。"], "hot_skills": [{"skill": "Shell", "score": 374047, "category": "自动化运维"}, {"skill": "JavaScript", "score": 189491, "category": "前端开发"}, {"skill": "AI", "score": 163453, "category": "人工智能"}, {"skill": "Rust", "score": 131318, "category": "系统编程"}, {"skill": "Agent", "score": 130548, "category": "人工智能"}, {"skill": "TypeScript", "score": 109856, "category": "前端工程化"}, {"skill": "Python", "score": 84216, "category": "后端 / 数据分析"}, {"skill": "MySQL", "score": 46376, "category": "数据库"}, {"skill": "Node.js", "score": 46376, "category": "后端 / 全栈"}, {"skill": "PostgreSQL", "score": 46376, "category": "数据库"}, {"skill": "Prisma", "score": 46376, "category": "数据库 ORM"}, {"skill": "SQLite", "score": 46376, "category": "数据库"}]};
+    window.HOT_SKILLS = [{"skill": "Shell", "score": 374047, "category": "自动化运维"}, {"skill": "JavaScript", "score": 189491, "category": "前端开发"}, {"skill": "AI", "score": 163453, "category": "人工智能"}, {"skill": "Rust", "score": 131318, "category": "系统编程"}, {"skill": "Agent", "score": 130548, "category": "人工智能"}, {"skill": "TypeScript", "score": 109856, "category": "前端工程化"}, {"skill": "Python", "score": 84216, "category": "后端 / 数据分析"}, {"skill": "MySQL", "score": 46376, "category": "数据库"}, {"skill": "Node.js", "score": 46376, "category": "后端 / 全栈"}, {"skill": "PostgreSQL", "score": 46376, "category": "数据库"}, {"skill": "Prisma", "score": 46376, "category": "数据库 ORM"}, {"skill": "SQLite", "score": 46376, "category": "数据库"}];
+    window.API_MODE = false;
+  </script>
+  <script>
+    const picker = document.getElementById('skillPicker');
+    const resultBox = document.getElementById('matchResult');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const clearBtn = document.getElementById('clearBtn');
+
+    function selectedSkills() {
+      return [...picker.querySelectorAll('input:checked')].map(input => input.value);
+    }
+
+    function categoryFor(skill) {
+      const found = window.HOT_SKILLS.find(item => item.skill.toLowerCase() === skill.toLowerCase());
+      return found ? found.category : '通用技术';
+    }
+
+    window.calculateStaticReport = function(skills) {
+      const owned = new Set(skills.map(skill => skill.toLowerCase()));
+      const total = window.HOT_SKILLS.reduce((sum, item) => sum + item.score, 0) || 1;
+      const ownedScore = window.HOT_SKILLS
+        .filter(item => owned.has(item.skill.toLowerCase()))
+        .reduce((sum, item) => sum + item.score, 0);
+      const match = Math.round(ownedScore / total * 100);
+      const missing = window.HOT_SKILLS
+        .filter(item => !owned.has(item.skill.toLowerCase()))
+        .slice(0, 6);
+      const gapMap = new Map();
+      missing.forEach(item => gapMap.set(item.category, (gapMap.get(item.category) || 0) + item.score));
+      const gaps = [...gapMap.entries()]
+        .map(([category, score]) => ({category, score}))
+        .sort((a, b) => b.score - a.score);
+      const level = match >= 80 ? '高度匹配' : match >= 55 ? '中等匹配' : match >= 30 ? '基础匹配' : '需要补强';
+      const recommendations = missing.length
+        ? missing.slice(0, 5).map(item => `优先学习 ${item.skill}，它属于「${item.category}」方向，在当前 GitHub 趋势数据中热度较高。`)
+        : ['你的技能栈已经覆盖当前趋势中的主要方向，可以继续做项目沉淀和深度优化。'];
+      return {
+        match_percent: match,
+        level,
+        selected_skills: skills,
+        matched_skills: window.HOT_SKILLS.filter(item => owned.has(item.skill.toLowerCase())),
+        missing_skills: missing,
+        category_gaps: gaps,
+        recommendations,
+        hot_skills: window.HOT_SKILLS
+      };
+    };
+
+    function renderReport(report) {
+      const missing = report.missing_skills.map(item =>
+        `<li><strong>${item.skill}</strong><span>${item.category}</span></li>`
+      ).join('');
+      const gaps = report.category_gaps.map(item =>
+        `<li><strong>${item.category}</strong><span>${item.score}</span></li>`
+      ).join('');
+      const recommendations = report.recommendations.map(text => `<li>${text}</li>`).join('');
+      resultBox.innerHTML = `
+        <div class="score-wrap">
+          <div class="score-circle" style="--score:${report.match_percent}">
+            <div class="score-inner">${report.match_percent}%</div>
+          </div>
+          <div>
+            <span class="badge">${report.level}</span>
+            <h3>需要补强的技术</h3>
+            <ul class="result-list">${missing || '<li><strong>暂无明显短板</strong><span>继续深入项目实践</span></li>'}</ul>
+          </div>
+        </div>
+        <h3>短板方向</h3>
+        <ul class="result-list">${gaps || '<li><strong>覆盖较全面</strong><span>保持学习节奏</span></li>'}</ul>
+        <h3>学习建议</h3>
+        <ul class="result-list">${recommendations}</ul>
+      `;
+    }
+
+    async function analyze() {
+      const skills = selectedSkills();
+      if (window.API_MODE) {
+        const res = await fetch('/api/skill-match', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({skills})
+        });
+        renderReport(await res.json());
+      } else {
+        renderReport(window.calculateStaticReport(skills));
+      }
+    }
+
+    clearBtn.addEventListener('click', () => {
+      picker.querySelectorAll('input').forEach(input => input.checked = false);
+      analyze();
+    });
+    analyzeBtn.addEventListener('click', analyze);
+    const initialSelected = new Set((window.INITIAL_REPORT.selected_skills || []).map(skill => skill.toLowerCase()));
+    picker.querySelectorAll('input').forEach(input => {
+      input.checked = initialSelected.has(input.value.toLowerCase());
+    });
+    renderReport(window.INITIAL_REPORT);
+  </script>
+</body>
+</html>
